@@ -1,0 +1,224 @@
+import { useState } from "react";
+
+const mealLibrary = [
+  {
+    name: "Herb-Roasted Chicken Nourish Bowl",
+    diet: "omnivore",
+    protein: "Chicken",
+    carbs: "Quinoa",
+    veg: ["Broccoli", "Carrots"],
+    format: "hot",
+    iron: false,
+    focus: "Balanced nourishment & sustained energy"
+  },
+  {
+    name: "Grounding Turkey Vitality Bowl",
+    diet: "omnivore",
+    protein: "Turkey",
+    carbs: "Rice",
+    veg: ["Spinach", "Peppers"],
+    format: "hot",
+    iron: false,
+    focus: "Steady energy & blood sugar balance"
+  },
+  {
+    name: "Iron-Rich Rooted Beef Bowl",
+    diet: "omnivore",
+    protein: "Beef",
+    carbs: "Rice",
+    veg: ["Spinach", "Peppers"],
+    format: "hot",
+    iron: true,
+    focus: "Iron support & deep nourishment"
+  },
+  {
+    name: "Garden Herb Chicken Wrap",
+    diet: "omnivore",
+    protein: "Chicken",
+    carbs: "Wrap",
+    veg: ["Spinach", "Cucumber"],
+    format: "cold",
+    iron: false,
+    focus: "Light, refreshing midday fuel"
+  },
+  {
+    name: "Plant-Powered Vitality Bowl",
+    diet: "vegan",
+    protein: "Tofu",
+    carbs: "Quinoa",
+    veg: ["Broccoli", "Zucchini"],
+    format: "hot",
+    iron: true,
+    focus: "Plant-based protein & mineral support"
+  },
+  {
+    name: "Lentil & Greens Restoration Bowl",
+    diet: "vegan",
+    protein: "Lentils",
+    carbs: "Rice",
+    veg: ["Spinach", "Tomatoes"],
+    format: "hot",
+    iron: true,
+    focus: "Iron support & sustained fullness"
+  },
+  {
+    name: "Fresh Garden Wrap",
+    diet: "vegan",
+    protein: "Chickpeas",
+    carbs: "Wrap",
+    veg: ["Spinach", "Peppers"],
+    format: "cold",
+    iron: false,
+    focus: "Light nourishment & digestive ease"
+  }
+];
+
+const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+
+export default function ClientPlanGenerator() {
+  const [clientName, setClientName] = useState("");
+  const [goal, setGoal] = useState("fat loss");
+  const [diet, setDiet] = useState("omnivore");
+  const [ironFocus, setIronFocus] = useState(false);
+  const [noHeat, setNoHeat] = useState(false);
+  const [variety, setVariety] = useState(3);
+  const [plan, setPlan] = useState([]);
+
+  const getReason = (meal) => {
+    if (ironFocus && meal.iron) return "Supports iron levels and overall energy.";
+    if (goal === "fat loss") return "Balanced to support fat loss and sustained fullness.";
+    if (goal === "muscle") return "Supports muscle repair and strength.";
+    return "Designed for steady energy and nourishment.";
+  };
+
+  const generatePlan = () => {
+    let filtered = mealLibrary.filter(m =>
+      (diet === "omnivore" || m.diet === diet) &&
+      (!noHeat || m.format === "cold") &&
+      (!ironFocus || m.iron)
+    );
+
+    if (filtered.length === 0) filtered = mealLibrary;
+
+    const shuffled = [...filtered].sort(() => 0.5 - Math.random());
+    const selected = shuffled.slice(0, variety);
+
+    const weekly = days.map((day, i) => ({
+      day,
+      meal: selected[i % selected.length]
+    }));
+
+    setPlan(weekly);
+  };
+
+  const handlePrint = () => window.print();
+
+return (
+  <div style={{ padding: "20px", maxWidth: "900px", margin: "0 auto" }}>
+    
+    <h1 style={{ fontSize: "24px", marginBottom: "5px" }}>
+      The Holistic Apothecary Kitchen
+    </h1>
+    <p style={{ color: "#555", marginBottom: "10px" }}>
+      Nourishment rooted in balance, nature, and intention
+    </p>
+
+    {clientName && (
+      <p style={{ marginBottom: "15px" }}>
+        Prepared for: <strong>{clientName}</strong>
+      </p>
+    )}
+
+    {/* Inputs */}
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "15px" }}>
+      <input
+        placeholder="Client Name"
+        style={{ padding: "8px", border: "1px solid #ccc", borderRadius: "8px" }}
+        onChange={(e) => setClientName(e.target.value)}
+      />
+
+      <select
+        onChange={(e) => setGoal(e.target.value)}
+        style={{ padding: "8px", border: "1px solid #ccc", borderRadius: "8px" }}
+      >
+        <option value="fat loss">Fat Loss</option>
+        <option value="maintenance">Maintenance</option>
+        <option value="muscle">Muscle Gain</option>
+      </select>
+
+      <select
+        onChange={(e) => setDiet(e.target.value)}
+        style={{ padding: "8px", border: "1px solid #ccc", borderRadius: "8px" }}
+      >
+        <option value="omnivore">Omnivore</option>
+        <option value="vegan">Vegan</option>
+      </select>
+
+      <select
+        onChange={(e) => setVariety(Number(e.target.value))}
+        style={{ padding: "8px", border: "1px solid #ccc", borderRadius: "8px" }}
+      >
+        <option value={2}>2 Meals</option>
+        <option value={3}>3 Meals</option>
+        <option value={5}>5 Meals</option>
+      </select>
+    </div>
+
+    {/* Toggles */}
+    <div style={{ marginBottom: "15px" }}>
+      <label style={{ marginRight: "15px" }}>
+        <input type="checkbox" onChange={(e) => setIronFocus(e.target.checked)} /> Iron Support
+      </label>
+
+      <label>
+        <input type="checkbox" onChange={(e) => setNoHeat(e.target.checked)} /> No Microwave
+      </label>
+    </div>
+
+    {/* Buttons */}
+    <div style={{ marginBottom: "20px" }}>
+      <button
+        onClick={generatePlan}
+        style={{ background: "#2f5d50", color: "white", padding: "10px 16px", borderRadius: "10px", border: "none", marginRight: "10px" }}
+      >
+        Generate Plan
+      </button>
+
+      <button
+        onClick={handlePrint}
+        style={{ border: "1px solid #ccc", padding: "10px 16px", borderRadius: "10px" }}
+      >
+        Download PDF
+      </button>
+    </div>
+
+    {/* Plan Output */}
+    <div>
+      {plan.map((item, i) => (
+        <div
+          key={i}
+          style={{ padding: "15px", border: "1px solid #ddd", borderRadius: "10px", marginBottom: "10px" }}
+        >
+          <h3>{item.day}</h3>
+          <strong>{item.meal.name}</strong>
+          <p>{item.meal.format === "cold" ? "Cold meal" : "Hot meal"}</p>
+
+          <p>
+            Includes: {item.meal.protein}, {item.meal.carbs}, {item.meal.veg.join(", ")}
+          </p>
+
+          <p style={{ fontStyle: "italic", color: "#555" }}>
+            {item.meal.focus || getReason(item.meal)}
+          </p>
+        </div>
+      ))}
+    </div>
+
+    {/* Footer */}
+    <div style={{ marginTop: "20px", fontSize: "14px", color: "#555" }}>
+      <p><strong>Storage:</strong> Keep refrigerated 3–4 days</p>
+      <p><strong>Reheating:</strong> Heat 1–2 min or enjoy cold</p>
+    </div>
+
+  </div>
+);
